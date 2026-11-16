@@ -57,7 +57,7 @@ const codeTasks=[
 ];
 const stopPreviews={
 fuel:"Full fuel/charge · Mechanic saves $4",groceries:"+25 food · +8 health if sick",taco:"+12 food · +8 morale · E. coli risk",diner:"+22 food · +8 health · +7 morale",
-holiday:"+25 health · +20 morale · -80 fatigue · Manager saves $8",budget:"+5 health · -12 morale · -30 fatigue · Manager saves $8",carrest:"-5 health · -20 fatigue (vehicle changes comfort)",urgent:"+35 health · Nurse saves $10",bathroom:"Clears bathroom urgency · -2 morale",music:"+10 morale · +5 fatigue (Teacher +5 morale)",scenic:"+15 morale · -5 fatigue (diminishing returns after two free breaks)"
+holiday:"+25 health · +20 morale · -80 fatigue",budget:"+5 health · -12 morale · -30 fatigue",carrest:"-5 health · -20 fatigue (vehicle changes comfort)",urgent:"+35 health · Nurse saves $10",bathroom:"Clears bathroom urgency · -2 morale",music:"+10 morale · +5 fatigue (Teacher +5 morale)",scenic:"+15 morale · -5 fatigue (diminishing returns after two free breaks)"
 };
 const warmups=[
 {question:"What keyword creates a changeable variable?",answer:"let",hint:"It has three letters and starts with l."},
@@ -115,11 +115,6 @@ if(game.profession===4&&kind==="scenic"&&Math.random()<0.5)o={...o,cashBonus:18,
 // Profession flavor is tied to the actual activity and its real stat changes.
 const pick=items=>items[Math.floor(Math.random()*items.length)];
 const careerNotes={
-0:{
-holiday:["MANAGER PERK: You called the front desk a strategic partner. Somehow the $8 discount survived the conversation.","MANAGER PERK: You negotiated a corporate rate without having a corporation. Save $8."],
-budget:["MANAGER PERK: You requested an executive suite. They gave you a room with a working lamp. At least you saved $8.","MANAGER PERK: You conducted a brief pricing review with the receptionist. Save $8."],
-scenic:["MANAGER INCIDENT: You tried to organize a team-building exercise with a squirrel. The squirrel requested a transfer.","MANAGER INCIDENT: You scheduled a mandatory synergy meeting with a mountain. Attendance was disappointing."]
-},
 1:{
 fuel:["MECHANIC PERK: You diagnosed the pump's problem as 'expensive.' Your $4 discount has been approved.","MECHANIC PERK: You found a loyalty coupon in the glovebox. Save $4."],
 carrest:["MECHANIC INCIDENT: You fell asleep listening for engine noises. The engine was off.","MECHANIC INCIDENT: You dreamed of a loose bolt and woke up checking the cupholders."]
@@ -144,7 +139,7 @@ scenic:["TEACHER INCIDENT: You gave a squirrel an unsolicited lesson on ecosyste
 if(game.profession!==6){
 const variants=careerNotes[game.profession]?.[kind];
 if(variants&&(kind==="scenic"||kind==="carrest")&&Math.random()<0.6)o={...o,label:o.label+"\n"+pick(variants)};
-else if(variants&&kind!=="scenic"&&kind!=="carrest"&&!(game.profession===4&&kind==="scenic"))o={...o,label:o.label.replace(/\n(?:MANAGER PERK|MECHANIC PERK|NURSE PERK|TEACHER PERK|INFLUENCER BONUS):[^\n]*/,"")+"\n"+pick(variants)};
+else if(variants&&kind!=="scenic"&&kind!=="carrest"&&!(game.profession===4&&kind==="scenic"))o={...o,label:o.label.replace(/\n(?:MECHANIC PERK|NURSE PERK|TEACHER PERK|INFLUENCER BONUS):[^\n]*/,"")+"\n"+pick(variants)};
 }
 if(game.profession===6&&Math.random()<0.35){
 const lucky=Math.random()<0.55;
