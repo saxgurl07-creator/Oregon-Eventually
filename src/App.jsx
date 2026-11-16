@@ -50,7 +50,41 @@ if(game.profession===0&&["holiday","budget"].includes(kind))o={...o,price:Math.m
 if(game.profession===1&&kind==="fuel")o={...o,price:Math.max(0,o.price-4),label:o.label+"\nMECHANIC PERK: You found a $4 fuel discount."};
 if(game.profession===3&&kind==="urgent")o={...o,price:Math.max(0,o.price-10),label:o.label+"\nNURSE PERK: Professional courtesy saves $10."};
 if(game.profession===5&&kind==="music")o={...o,morale:o.morale+5,label:o.label+"\nTEACHER PERK: Somehow this became a lesson in music appreciation."};
-if(game.profession===4&&kind==="scenic"&&Math.random()<0.5)o={...o,cashBonus:18,label:o.label+"\nINFLUENCER BONUS: A suspicious energy drink brand paid you $18 for a sponsored photo."};
+if(game.profession===4&&kind==="scenic"&&Math.random()<0.5)o={...o,cashBonus:18,label:o.label+"\nINFLUENCER BONUS: "+(["A suspicious energy drink brand paid you $18 for a sponsored photo.","Your mountain selfie got sponsored by motivational water. You earned $18.","A sunglasses company paid you $18 to pose with a tree. The tree got no royalties."][Math.floor(Math.random()*3)])};
+// Profession flavor is tied to the actual activity and its real stat changes.
+const pick=items=>items[Math.floor(Math.random()*items.length)];
+const careerNotes={
+0:{
+holiday:["MANAGER PERK: You called the front desk a strategic partner. Somehow the $8 discount survived the conversation.","MANAGER PERK: You negotiated a corporate rate without having a corporation. Save $8."],
+budget:["MANAGER PERK: You requested an executive suite. They gave you a room with a working lamp. At least you saved $8.","MANAGER PERK: You conducted a brief pricing review with the receptionist. Save $8."],
+scenic:["MANAGER INCIDENT: You tried to organize a team-building exercise with a squirrel. The squirrel requested a transfer.","MANAGER INCIDENT: You scheduled a mandatory synergy meeting with a mountain. Attendance was disappointing."]
+},
+1:{
+fuel:["MECHANIC PERK: You diagnosed the pump's problem as 'expensive.' Your $4 discount has been approved.","MECHANIC PERK: You found a loyalty coupon in the glovebox. Save $4."],
+carrest:["MECHANIC INCIDENT: You fell asleep listening for engine noises. The engine was off.","MECHANIC INCIDENT: You dreamed of a loose bolt and woke up checking the cupholders."]
+},
+2:{
+carrest:["DEVELOPER INCIDENT: You dreamed about a missing semicolon. The code was fine. Your neck isn't.","DEVELOPER INCIDENT: You woke up trying to dismiss a notification that was actually a moth."],
+scenic:["DEVELOPER INCIDENT: You tried to debug a waterfall. It refused to provide logs.","DEVELOPER INCIDENT: You asked a park ranger whether the mountain had an API. They walked away."]
+},
+3:{
+urgent:["NURSE PERK: You recognized the triage paperwork from across the room. Professional courtesy saves $10.","NURSE PERK: You calmly explained the symptoms while everyone else panicked. Save $10."],
+carrest:["NURSE INCIDENT: You woke up because someone sneezed three cars away. Your clinical instincts have no off switch.","NURSE INCIDENT: You packed a first-aid kit as a pillow. Surprisingly, not comfortable."]
+},
+4:{
+scenic:["INFLUENCER BONUS: A suspicious energy drink brand paid $18 for your overlook photo.","INFLUENCER BONUS: Your mountain selfie got sponsored by a company that sells motivational water. +$18."],
+carrest:["INFLUENCER INCIDENT: You tried to film a 'realistic car nap' and spent 20 minutes choosing a thumbnail.","INFLUENCER INCIDENT: You woke up with a seatbelt mark and called it a new skincare trend."]
+},
+5:{
+music:["TEACHER PERK: You turned the singalong into an impromptu music lesson. +5 morale.","TEACHER PERK: You taught everyone a harmony part. Nobody stayed on pitch, but +5 morale."],
+scenic:["TEACHER INCIDENT: You gave a squirrel an unsolicited lesson on ecosystems. It ate your visual aid.","TEACHER INCIDENT: You made a field-trip worksheet. The mountain declined to complete it."]
+}
+};
+if(game.profession!==6){
+const variants=careerNotes[game.profession]?.[kind];
+if(variants&&(kind==="scenic"||kind==="carrest")&&Math.random()<0.6)o={...o,label:o.label+"\\n"+pick(variants)};
+else if(variants&&kind!=="scenic"&&kind!=="carrest"&&!(game.profession===4&&kind==="scenic"))o={...o,label:o.label.replace(/\\n(?:MANAGER PERK|MECHANIC PERK|NURSE PERK|TEACHER PERK|INFLUENCER BONUS):[^\\n]*/,"")+"\\n"+pick(variants)};
+}
 if(game.profession===6&&Math.random()<0.35){
 const lucky=Math.random()<0.55;
 const purchasing=["fuel","groceries","taco","diner","holiday","budget","urgent"].includes(kind);
@@ -96,7 +130,7 @@ const morale=Math.max(0,Math.min(100,game.morale+(pace==="fast"?-6:2)+(car.moral
 const fatal=sick&&(illness>=4||health===0);
 const recover=fatal||food===0||health===0||energy===0;const fatigue=Math.min(100,game.fatigue+(pace==="fast"?35:pace==="careful"?15:25)+(car.fatiguePerLeg??0)+(game.profession===2?5:0));
 const event=fatal?"YOU HAVE DIED OF E. COLI. Cause of death: contaminated Taco Bell lettuce and ignoring increasingly urgent bathroom stops. A JavaScript medic can revive you.":missed?"E. COLI WARNING: You skipped another bathroom stop. Your stomach has declared a state of emergency. Visit a restroom and buy groceries before continuing.":sick?"E. COLI: Your stomach is still furious. Bathroom breaks and groceries will help you recover.":lesson[0]+": "+lesson[1]+" completed.";
-setGame(g=>({...g,index:i+1,food,energy,health,morale,fatigue,legsSinceRest:g.legsSinceRest+1,ecoli:illness,bathroomUrgency:urgency,xp:g.xp+10+i*5+(g.profession===5?5:0)+(g.profession===2?8:0),recover,log:[event,...g.log].slice(0,7)}));
+setGame(g=>({...g,index:i+1,food,energy,health,morale,fatigue,legsSinceRest:g.legsSinceRest+1,ecoli:illness,bathroomUrgency:urgency,xp:g.xp+10+i*5+(g.profession===5?5:0)+(g.profession===2?8:0),recover,log:[event+(g.profession===2?"\nDEVELOPER BONUS: +8 XP for debugging your way across the highway. PENALTY: +5 fatigue from sitting like a shrimp.":g.profession===5?"\nTEACHER BONUS: +5 XP. The road is now your classroom.":g.profession===3?"\nNURSE BONUS: +2 health from keeping everyone hydrated and checking symptoms.":g.profession===1?"\nMECHANIC BONUS: Saved 2 food by keeping supplies organized.":g.profession===0&&pace==="fast"?"\nMANAGER PENALTY: You held a performance review at 80 mph. -4 morale.":g.profession===4&&pace==="fast"?"\nINFLUENCER PENALTY: Filming while rushing is stressful. -4 morale.":""),...g.log].slice(0,7)}));
 setCode(lessons[Math.min(i+1,7)][5]);setLessonSeen(false);setQuiz(false);setQuizAnswer(-1);setResult("");setHint(false);setReview("");
 }
 function recover(){setScreen("map");if(review.trim()!=="1")return;setGame(g=>({...g,ecoli:0,bathroomUrgency:0,fatigue:40,legsSinceRest:0,food:25,energy:65,health:60,morale:60,recover:false,log:["A trail medic helped your party recover.",...g.log]}));setReview("")}
