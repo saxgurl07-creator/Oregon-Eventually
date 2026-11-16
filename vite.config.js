@@ -1,1 +1,4 @@
-import{defineConfig}from"vite";const repo=process.env.GITHUB_REPOSITORY?.split("/").pop()||"Oregon.exe";export default defineConfig({base:`/${repo}/`});
+import { defineConfig } from "vite";
+
+// GitHub Pages serves this project under the renamed repository path.
+export default defineConfig({ base: "/Oregon-Eventually/" });
