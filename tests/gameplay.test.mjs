@@ -57,3 +57,18 @@ test('crypto bro has risk and reward on each driving leg',()=>{
  const a=harness(0,0);a.drive();assert.ok([a.game.cash-50,a.game.cash,a.game.cash+20].includes(260));
  const b=harness(0,1);b.drive();assert.equal(b.game.cash,140);
 });
+
+test('three consecutive fast drives trigger a $45 speeding ticket and reset the streak',()=>{
+ const h=harness(2,1);h.game.food=100;h.drive('fast');h.drive('fast');h.drive('fast');
+ assert.equal(h.game.speedingTickets,1);assert.equal(h.game.fastStreak,0);
+ assert.ok(h.game.log[0].includes('SPEEDING TICKET'));
+ assert.equal(h.game.cash,95);
+});
+test('steady driving breaks a fast-driving streak',()=>{
+ const h=harness(2,1);h.game.food=100;h.drive('fast');h.drive('steady');h.drive('fast');
+ assert.equal(h.game.speedingTickets,0);assert.equal(h.game.fastStreak,1);
+});
+test('profession intro no longer refers to corporate manager',()=>{
+ assert.ok(!source.includes('corporate manager'));
+ assert.ok(source.includes('A crypto bro and an unemployed raccoon'));
+});
