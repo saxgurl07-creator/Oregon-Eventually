@@ -32,8 +32,8 @@ test('mechanic saves food and fuel money',()=>{
 test('nurse gets discounted urgent care',()=>{const h=harness(0,3);h.stop('urgent');assert.equal(h.game.cash,125)});
 test('manager gets discounted hotel',()=>{const h=harness(0,0);h.stop('holiday');assert.equal(h.game.cash,220)});
 test('fuel and groceries replenish their resources',()=>{const h=harness();h.drive();h.stop('fuel');assert.equal(h.game.energy,100);h.stop('groceries');assert.ok(h.game.food>20)});
-test('insufficient cash gives a debt-bearing emergency loan',()=>{const h=harness();h.game.cash=0;h.stop('holiday');assert.equal(h.game.cash,30);assert.equal(h.game.emergencyDebt,30);assert.equal(h.game.morale,67)});
-test('free scenic stops have diminishing returns',()=>{const h=harness();h.stop('scenic');h.stop('scenic');h.stop('scenic');assert.equal(h.game.freeBreaks,3);assert.equal(h.game.morale,100)});
+test('insufficient cash gives a debt-bearing emergency loan',()=>{const h=harness();h.game.cash=0;h.stop('holiday');assert.equal(h.game.cash,30);assert.equal(h.game.emergencyDebt,30);assert.equal(h.game.morale,55)});
+test('free scenic stops have diminishing returns',()=>{const h=harness();h.stop('scenic');h.stop('scenic');h.stop('scenic');assert.equal(h.game.freeBreaks,3);assert.equal(h.game.morale,90)});
 test('three driving legs require rest',()=>{const h=harness(2);h.game.food=100;h.drive();h.drive();h.drive();assert.equal(h.game.index,3);h.drive();assert.equal(h.game.index,3)});
 test('Taco Bell triggers illness; urgent care clears it',()=>{const h=harness();h.stop('taco');assert.equal(h.game.ecoli,1);h.stop('urgent');assert.equal(h.game.ecoli,0)});
 test('fast driving saves hours compared with careful driving',()=>{const a=harness(),b=harness();a.drive('fast');b.drive('careful');assert.ok(a.game.hours<b.game.hours)});
