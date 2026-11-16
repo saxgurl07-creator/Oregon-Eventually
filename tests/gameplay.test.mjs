@@ -177,3 +177,29 @@ test('fast driving cannot start without enough pace-adjusted fuel',()=>{
  h.drive('fast');assert.equal(h.game.index,0);
  h.drive('careful');assert.equal(h.game.index,1);
 });
+
+test('roadside emergencies have safe full-statement validators and meaningful consequences',()=>{
+ const chunk=slice('const roadsideEmergencies=','const start=');
+ const {roadsideEmergencies,checkRoadsideCode}=vm.runInNewContext(chunk+';({roadsideEmergencies,checkRoadsideCode})');
+ assert.equal(roadsideEmergencies.length,12);
+ for(const e of roadsideEmergencies){
+  assert.ok(e.chapter>=0&&e.chapter<8);
+  assert.ok(checkRoadsideCode(e,e.solution),e.title);
+  assert.ok(!checkRoadsideCode(e,''),e.title);
+  assert.ok(!checkRoadsideCode(e,'alert(1)'),e.title);
+  assert.ok(['morale','food','energy','fatigue','cash'].includes(e.penalty));
+  assert.ok(e.loss>0&&e.loss<=10);
+ }
+ assert.ok(checkRoadsideCode(roadsideEmergencies[0],'let snacksLeft = 8'));
+ assert.ok(!checkRoadsideCode(roadsideEmergencies[0],'snacksLeft = 8'));
+});
+test('emergency success awards XP; failure offers one hint then applies one penalty',()=>{
+ const chunk=slice('function resolveEmergency(){','function next(){');
+ const h={game:{...start,pendingEmergency:{id:0,attempts:0},log:[]},code:'oops',hint:false};
+ const ctx=vm.createContext({game:h.game,emergencyCode:h.code,roadsideEmergencies:vm.runInNewContext(slice('const roadsideEmergencies=','const start=')+';roadsideEmergencies'),checkRoadsideCode:vm.runInNewContext(slice('const roadsideEmergencies=','const start=')+';checkRoadsideCode'),setGame:fn=>{h.game=fn(h.game);ctx.game=h.game},setEmergencyHint:v=>h.hint=v,setEmergencyCode:v=>h.code=v});
+ vm.runInContext(chunk,ctx);
+ ctx.resolveEmergency();assert.equal(h.game.pendingEmergency.attempts,1);assert.equal(h.game.morale,70);assert.equal(h.hint,true);
+ ctx.resolveEmergency();assert.equal(h.game.pendingEmergency,null);assert.equal(h.game.morale,67);
+ h.game.pendingEmergency={id:0,attempts:0};ctx.game=h.game;ctx.emergencyCode='let snacksLeft = 8';
+ ctx.resolveEmergency();assert.equal(h.game.pendingEmergency,null);assert.equal(h.game.xp,5);
+});
