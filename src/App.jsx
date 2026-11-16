@@ -145,6 +145,16 @@ const bonus=purchasing?"RACCOON BONUS: You found $12 and a sealed snack behind t
 const penalty=purchasing?"RACCOON INCIDENT: You tried to pay with shiny bottle caps. The cashier called animal control. -9 morale.":(penaltyByStop[kind]||"RACCOON INCIDENT: Your curiosity caused a minor public disturbance. -9 morale.");
 o={...o,cashBonus:lucky?12:0,food:o.food+(lucky?8:0),morale:o.morale+(lucky?0:-9),label:o.label+"\n"+(lucky?bonus:penalty)};
 }
+// Roadside callbacks remember earlier decisions and vehicle/career combinations.
+const callbacks=[];
+if(kind==="fuel"&&game.vehicle===3)callbacks.push("CALLBACK: The attendant recognizes the Cybertruck. 'Still looking for the gas cap?' You insist you're here for electricity.");
+if(kind==="diner"&&game.tacoVisits>0)callbacks.push("CALLBACK: You ask whether the lettuce is safe. The waitress quietly removes the salad menu.");
+if(kind==="holiday"&&game.carNaps>=2)callbacks.push("CALLBACK: The receptionist sees your seatbelt-shaped pillow crease and upgrades you to an actual bed. No extra charge.");
+if(kind==="budget"&&game.profession===6&&game.hotelStays>0)callbacks.push("CALLBACK: The front desk already has a photo of you labeled DO NOT FEED AFTER MIDNIGHT.");
+if(kind==="scenic"&&game.profession===2&&game.scenicStops>0)callbacks.push("CALLBACK: The park ranger remembers your request for the mountain's API documentation. They have prepared a restraining order.");
+if(kind==="music"&&game.profession===5&&game.scenicStops>0)callbacks.push("CALLBACK: Your impromptu field trip has somehow become a mandatory music curriculum.");
+if(kind==="carrest"&&game.tacoVisits>=2)callbacks.push("CALLBACK: Your stomach hears the words 'Taco Bell' in a dream and files another complaint.");
+if(callbacks.length)o={...o,label:o.label+"\\n"+callbacks[Math.floor(Math.random()*callbacks.length)]};
 if(game.cash<o.price){setScreen("event");setGame(g=>({...g,cash:g.cash+30,emergencyDebt:g.emergencyDebt+30,morale:Math.max(0,g.morale-3),log:["ROADSIDE ASSISTANCE: A $30 emergency loan arrives. You owe the trail bank $30 and lose 3 morale. Try your purchase again.",...g.log].slice(0,7)}));return}
 if(["music","scenic"].includes(kind)&&game.freeBreaks>=2){o={...o,morale:Math.min(o.morale,2),fatigue:Math.max(0,o.fatigue||0),label:o.label+"\nDIMINISHING RETURNS: Your party is tired of stopping. Only +2 morale this time."};}
 setScreen("event");
