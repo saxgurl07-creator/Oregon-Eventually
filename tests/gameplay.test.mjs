@@ -59,7 +59,7 @@ test('crypto bro has risk and reward on each driving leg',()=>{
 });
 
 test('three consecutive fast drives trigger a $45 speeding ticket and reset the streak',()=>{
- const h=harness(2,1);h.game.food=100;h.drive('fast');h.drive('fast');h.drive('fast');
+ const h=harness(2,1);h.game.food=100;h.drive('fast');h.game.fatigue=0;h.drive('fast');h.game.fatigue=0;h.drive('fast');
  assert.equal(h.game.speedingTickets,1);assert.equal(h.game.fastStreak,0);
  assert.ok(h.game.log[0].includes('SPEEDING TICKET'));
  assert.equal(h.game.cash,95);
