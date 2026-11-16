@@ -65,7 +65,7 @@ test('three consecutive fast drives trigger a $45 speeding ticket and reset the 
  assert.equal(h.game.cash,95);
 });
 test('steady driving breaks a fast-driving streak',()=>{
- const h=harness(2,1);h.game.food=100;h.drive('fast');h.drive('steady');h.drive('fast');
+ const h=harness(2,1);h.game.food=100;h.drive('fast');h.game.fatigue=0;h.drive('steady');h.game.fatigue=0;h.drive('fast');
  assert.equal(h.game.speedingTickets,0);assert.equal(h.game.fastStreak,1);
 });
 test('profession intro no longer refers to corporate manager',()=>{
