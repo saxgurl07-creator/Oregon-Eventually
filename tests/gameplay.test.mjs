@@ -105,12 +105,13 @@ test('speeding streak is visible and only completed drives count',()=>{
 });
 
 test('third fast drive triggers ticket even with pit stops and slower drives between',()=>{
- const h=harness(2,1);h.game.food=100;
- h.drive('fast');h.stop('fuel');h.stop('carrest');
- h.game.food=100;h.game.fatigue=0;h.drive('steady');h.stop('carrest');
- h.game.food=100;h.game.fatigue=0;h.drive('fast');h.stop('fuel');h.stop('carrest');
- h.game.food=100;h.game.fatigue=0;h.drive('careful');h.stop('carrest');
- h.game.food=100;h.game.fatigue=0;h.game.energy=100;h.drive('fast');
+ const h=harness(0,1);
+ for(const [i,pace] of ['fast','steady','fast','careful','fast'].entries()){
+  h.game.food=100;h.game.energy=100;h.game.fatigue=0;h.game.health=85;h.game.morale=70;
+  h.drive(pace);
+  assert.equal(h.game.index,i+1,'drive '+(i+1)+' must actually complete');
+  if(i<4){h.stop('fuel');h.stop('carrest');}
+ }
  assert.equal(h.game.speedingTickets,1);
  assert.equal(h.game.fastStreak,0);
  assert.ok(h.game.log[0].includes('SPEEDING TICKET'));
