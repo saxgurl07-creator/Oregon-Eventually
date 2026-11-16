@@ -1,4 +1,4 @@
-name: Deploy OREGON.EXE
+name: Deploy Oregon, Eventually
 on:
   push:
     branches: [main]
