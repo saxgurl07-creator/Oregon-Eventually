@@ -10,7 +10,7 @@ const {vehicles,professions,start}=vm.runInNewContext(definitions);
 function harness(vehicle=0,profession=0){
  const state={...start,vehicle,profession,cash:160+professions[profession].cash,health:Math.min(100,85+professions[profession].health),morale:Math.min(100,70+professions[profession].morale),xp:professions[profession].xp,log:[...start.log]};
  const h={game:state,car:vehicles[vehicle],pace:'steady',screen:'map',eventReturnScreen:'map'};
- const route=vm.runInNewContext(source.slice(source.indexOf('const routeLegs='),source.indexOf('const quizQuestions='))+';({routeLegs,routeMiles,milesRemaining,drivingHours})');
+ const route=vm.runInNewContext(source.slice(source.indexOf('const routeLegs='),source.indexOf('const quizQuestions='))+';({routeLegs,routeMiles,milesRemaining,drivingHours,paceBurn})');
  const sandbox={Math,console,vehicles,professions,...route,lessons:vm.runInNewContext(slice('const lessons=','const quizQuestions=')+';lessons'),setTicketPopup:v=>h.ticketPopup=v,setScreen:v=>h.screen=v,setEventReturnScreen:v=>h.eventReturnScreen=v,setGame:fn=>{h.game=typeof fn==='function'?fn(h.game):fn;sync()},setCode:()=>{},setSlots:()=>{},setWarmupAnswer:()=>{},setWarmupCorrect:()=>{},setLessonSeen:()=>{},setQuiz:()=>{},setQuizAnswer:()=>{},setResult:()=>{},setHint:()=>{},setReview:()=>{}};
  function sync(){sandbox.game=h.game;sandbox.car=vehicles[h.game.vehicle];sandbox.pace=h.pace;sandbox.lesson=sandbox.lessons[Math.min(h.game.index,7)]}
  sync();
@@ -156,4 +156,24 @@ test('chapter completion is one-time, saves outcomes, and preserves resource cap
  context.applyChapterSuccess(6);assert.equal(h.game.morale,100);
  context.applyChapterSuccess(7);assert.equal(h.game.chapterOffers.gpsFixed,true);
  assert.equal(h.game.completedChapters.length,8);
+});
+
+test('pace changes fuel use and journey time while keeping steady as baseline',()=>{
+ const route=vm.runInNewContext(source.slice(source.indexOf('const routeLegs='),source.indexOf('const quizQuestions='))+';({routeLegs,drivingHours,paceBurn})');
+ const car=vehicles[0],leg=route.routeLegs[2];
+ assert.ok(route.paceBurn(car,'careful')<car.burn);
+ assert.equal(route.paceBurn(car,'steady'),car.burn);
+ assert.ok(route.paceBurn(car,'fast')>car.burn);
+ assert.ok(route.drivingHours(leg,'careful')>route.drivingHours(leg,'steady'));
+ assert.ok(route.drivingHours(leg,'fast')<route.drivingHours(leg,'steady'));
+ const a=harness(0),b=harness(0),c=harness(0);
+ a.drive('careful');b.drive('steady');c.drive('fast');
+ assert.ok(a.game.energy>b.game.energy&&b.game.energy>c.game.energy);
+ assert.ok(a.game.fatigue<b.game.fatigue&&b.game.fatigue<c.game.fatigue);
+ assert.ok(a.game.hours>b.game.hours&&b.game.hours>c.game.hours);
+});
+test('fast driving cannot start without enough pace-adjusted fuel',()=>{
+ const h=harness(0);h.game.energy=18;
+ h.drive('fast');assert.equal(h.game.index,0);
+ h.drive('careful');assert.equal(h.game.index,1);
 });
