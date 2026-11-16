@@ -64,9 +64,9 @@ test('three consecutive fast drives trigger a $45 speeding ticket and reset the 
  assert.ok(h.game.log[0].includes('SPEEDING TICKET'));
  assert.equal(h.game.cash,95);
 });
-test('steady driving breaks a fast-driving streak',()=>{
+test('steady driving does not erase fast-drive ticket progress',()=>{
  const h=harness(2,1);h.game.food=100;h.drive('fast');h.game.fatigue=0;h.drive('steady');h.game.fatigue=0;h.drive('fast');
- assert.equal(h.game.speedingTickets,0);assert.equal(h.game.fastStreak,1);
+ assert.equal(h.game.speedingTickets,0);assert.equal(h.game.fastStreak,2);
 });
 test('profession intro no longer refers to corporate manager',()=>{
  assert.ok(!source.includes('corporate manager'));
@@ -89,9 +89,21 @@ test('low charge and fuel have visible warnings in drive and pit stop screens',(
  assert.equal(h.game.fastStreak,0);
 });
 test('speeding streak is visible and only completed drives count',()=>{
- assert.ok(source.includes('FAST DRIVING STREAK:'));
+ assert.ok(!source.includes('FAST DRIVING STREAK:'));
  const h=harness(3,1);h.game.food=100;h.game.energy=100;h.drive('fast');
  assert.equal(h.game.fastStreak,1);
  h.game.energy=0;h.drive('fast');
  assert.equal(h.game.fastStreak,1);
+});
+
+test('third fast drive triggers ticket even with pit stops and slower drives between',()=>{
+ const h=harness(2,1);h.game.food=100;
+ h.drive('fast');h.stop('fuel');h.stop('carrest');
+ h.drive('steady');h.stop('carrest');
+ h.drive('fast');h.stop('fuel');h.stop('carrest');
+ h.drive('careful');h.stop('carrest');
+ h.drive('fast');
+ assert.equal(h.game.speedingTickets,1);
+ assert.equal(h.game.fastStreak,0);
+ assert.ok(h.game.log[0].includes('SPEEDING TICKET'));
 });
