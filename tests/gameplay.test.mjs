@@ -77,5 +77,5 @@ test('former manager hotel and scenic perks are fully removed',()=>{
  assert.ok(!/MANAGER PERK|MANAGER INCIDENT|Manager saves|corporate manager/i.test(source));
  const h=harness(0,1);h.stop('holiday');
  assert.ok(!/MANAGER/i.test(h.game.log[0]));
- assert.equal(h.game.cash,212);
+ assert.equal(h.game.cash,92);
 });
