@@ -23,5 +23,5 @@ test('each coding exercise has only editable slots and fixed code',()=>{
  for(const task of tasks){assert.equal(typeof task.parts[0],'string');assert.equal(typeof task.parts.at(-1),'string');}
 });
 test('core survival rules and restart remain present',()=>{
- for(const marker of ['legsSinceRest','ecoli','function recover()','function restart()','game.energy<car.burn','localStorage.setItem'])assert.ok(source.includes(marker),marker);
+ for(const marker of ['game.fatigue>=70','ecoli','function recover()','function restart()','game.energy<car.burn','localStorage.setItem'])assert.ok(source.includes(marker),marker);
 });
