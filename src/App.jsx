@@ -11,8 +11,9 @@ const lessons=[
 ];
 const vehicles=[{name:'Sedan',icon:'🚗',burn:15},{name:'SUV',icon:'🚙',burn:20},{name:'Pickup',icon:'🛻',burn:25},{name:'Cybertruck',icon:'⚡',burn:35}];
 const start={vehicle:null,energy:100,cash:160,index:0,food:35,health:85,morale:70,xp:0,log:["You set out from Muskogee, Oklahoma."],recover:false};
-function load(){try{const x=JSON.parse(localStorage.getItem("oregon-exe-save-v1"));return x&&Number.isInteger(x.index)&&x.index>=0&&x.index<=8?x:start}catch{return start}}
+function load(){try{const x=JSON.parse(localStorage.getItem("oregon-exe-save-v1"));return x&&Number.isInteger(x.index)&&x.index>=0&&x.index<=8?{...start,...x}:start}catch{return start}}
 export default function App(){
+const [lessonSeen,setLessonSeen]=useState(false),[quiz,setQuiz]=useState(false),[quizAnswer,setQuizAnswer]=useState(-1);
 const [game,setGame]=useState(load),[code,setCode]=useState(lessons[Math.min(load().index,7)][5]),[result,setResult]=useState(""),[hint,setHint]=useState(false),[pace,setPace]=useState("steady"),[review,setReview]=useState("");
 useEffect(()=>localStorage.setItem("oregon-exe-save-v1",JSON.stringify(game)),[game]);
 const lesson=lessons[Math.min(game.index,7)],done=game.index>=8;const car=vehicles[game.vehicle??0];
