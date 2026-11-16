@@ -31,10 +31,10 @@ test('mechanic saves food and fuel money',()=>{
  a.stop('fuel');b.stop('fuel');assert.equal(a.game.cash-(160+professions[0].cash),-22);assert.equal(b.game.cash-(160+professions[1].cash),-18);
 });
 test('nurse gets discounted urgent care',()=>{const h=harness(0,3);h.stop('urgent');assert.equal(h.game.cash,125)});
-test('manager gets discounted hotel',()=>{const h=harness(0,0);h.stop('holiday');assert.equal(h.game.cash,220)});
+test('crypto bro pays regular hotel prices',()=>{const h=harness(0,0);h.stop('holiday');assert.equal(h.game.cash,212)});
 test('fuel and groceries replenish their resources',()=>{const h=harness();h.drive();h.stop('fuel');assert.equal(h.game.energy,100);h.stop('groceries');assert.ok(h.game.food>20)});
-test('insufficient cash gives a debt-bearing emergency loan',()=>{const h=harness();h.game.cash=0;h.stop('holiday');assert.equal(h.game.cash,30);assert.equal(h.game.emergencyDebt,30);assert.equal(h.game.morale,55)});
-test('free scenic stops have diminishing returns',()=>{const h=harness();h.stop('scenic');h.stop('scenic');h.stop('scenic');assert.equal(h.game.freeBreaks,3);assert.equal(h.game.morale,90)});
+test('insufficient cash gives a debt-bearing emergency loan',()=>{const h=harness();h.game.cash=0;h.stop('holiday');assert.equal(h.game.cash,30);assert.equal(h.game.emergencyDebt,30);assert.equal(h.game.morale,77)});
+test('free scenic stops have diminishing returns',()=>{const h=harness();h.stop('scenic');h.stop('scenic');h.stop('scenic');assert.equal(h.game.freeBreaks,3);assert.equal(h.game.morale,100)});
 test('three driving legs require rest',()=>{const h=harness(2);h.game.food=100;h.drive();h.drive();h.drive();assert.equal(h.game.index,3);h.drive();assert.equal(h.game.index,3)});
 test('Taco Bell triggers illness; urgent care clears it',()=>{const h=harness();h.stop('taco');assert.equal(h.game.ecoli,1);h.stop('urgent');assert.equal(h.game.ecoli,0)});
 test('fast driving saves hours compared with careful driving',()=>{const a=harness(),b=harness();a.drive('fast');b.drive('careful');assert.ok(a.game.hours<b.game.hours)});
@@ -50,4 +50,10 @@ test('road route totals and cumulative driving time use distinct real-world legs
  assert.equal(route.routeLegs[2].miles,520);
  assert.ok(route.drivingHours(route.routeLegs[2],'fast')<route.drivingHours(route.routeLegs[2],'steady'));
  const h=harness();h.drive();assert.equal(h.game.milesDriven,49);assert.equal(h.game.hours,0.9);
+});
+
+test('crypto bro has risk and reward on each driving leg',()=>{
+ assert.equal(professions[0].name,'Crypto Bro');
+ const a=harness(0,0);a.drive();assert.ok([a.game.cash-50,a.game.cash,a.game.cash+20].includes(260));
+ const b=harness(0,1);b.drive();assert.equal(b.game.cash,140);
 });
