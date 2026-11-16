@@ -38,3 +38,15 @@ test('three driving legs require rest',()=>{const h=harness(2);h.game.food=100;h
 test('Taco Bell triggers illness; urgent care clears it',()=>{const h=harness();h.stop('taco');assert.equal(h.game.ecoli,1);h.stop('urgent');assert.equal(h.game.ecoli,0)});
 test('fast driving saves hours compared with careful driving',()=>{const a=harness(),b=harness();a.drive('fast');b.drive('careful');assert.ok(a.game.hours<b.game.hours)});
 test('recovery is triggered when illness becomes fatal',()=>{const h=harness();h.game.ecoli=3;h.game.bathroomUrgency=1;h.drive();assert.equal(h.game.recover,true)});
+
+test('road route totals and cumulative driving time use distinct real-world legs',()=>{
+ const route=vm.runInNewContext(source.slice(source.indexOf('const routeLegs='),source.indexOf('const quizQuestions='))+';({routeLegs,routeMiles,milesRemaining,drivingHours})');
+ assert.equal(route.routeLegs.length,8);
+ assert.equal(route.routeMiles,2116);
+ assert.equal(route.milesRemaining(2),1887);
+ assert.equal(route.milesRemaining(8),0);
+ assert.equal(route.routeLegs[0].miles,49);
+ assert.equal(route.routeLegs[2].miles,520);
+ assert.ok(route.drivingHours(route.routeLegs[2],'fast')<route.drivingHours(route.routeLegs[2],'steady'));
+ const h=harness();h.drive();assert.equal(h.game.milesDriven,49);assert.equal(h.game.hours,0.9);
+});
