@@ -32,13 +32,13 @@ const miniLessons=[
 // Only the highlighted input slots are editable; the rest is fixed, valid JavaScript.
 const codeTasks=[
 {parts:["let food = ",{hint:"number of snacks",answer:/^12$/},";"],tip:"Type the number 12. The variable name and punctuation are already done for you."},
-{parts:["let totalTacos = ",{hint:"multiplication",answer:/^(4\\s*\\*\\s*3|3\\s*\\*\\s*4)$/},";"],tip:"Multiply 4 people by 3 tacos using *."},
-{parts:["let milesLeft = 420;\\nlet longDrive = ",{hint:"comparison",answer:/^milesLeft\\s*>\\s*100$/},";"],tip:"Compare milesLeft to 100 using the greater-than sign (>)."},
-{parts:["let food = 7;\\nif (",{hint:"condition",answer:/^food\\s*<\\s*10$/},") {\\n  // buy groceries\\n}"],tip:"Write the condition only: check whether food is less than 10."},
-{parts:["for (let i = 0; ",{hint:"when to continue",answer:/^i\\s*<\\s*5$/},"; ",{hint:"how to count",answer:/^i\\+\\+$/},") {\\n  // find a restroom\\n}"],tip:"Fill the first slot with i < 5. Fill the second with i++ to add one each time."},
-{parts:["function repairFluxCapacitor() {\\n  return ",{hint:"return value",answer:/^['\"]fixed['\"]$/},";\\n}"],tip:"Return the word fixed as a string. Strings need quotes, like 'fixed'."},
-{parts:["let playlist = [",{hint:"three genres",answer:/^['\"]Rock['\"]\\s*,\\s*['\"]Pop['\"]\\s*,\\s*['\"]Jazz['\"]$/},"];"],tip:"Enter three quoted strings, separated by commas: 'Rock', 'Pop', 'Jazz'."},
-{parts:["let milesLeft = 0;\\nlet arrived = milesLeft ",{hint:"comparison operator",answer:/^===$/}," 0;"],tip:"Replace the assignment with the strict comparison operator ===."}
+{parts:["let totalTacos = ",{hint:"multiplication",answer:/^(4\s*\*\s*3|3\s*\*\s*4)$/},";"],tip:"Multiply 4 people by 3 tacos using *."},
+{parts:["let milesLeft = 420;\nlet longDrive = ",{hint:"comparison",answer:/^milesLeft\s*>\s*100$/},";"],tip:"Compare milesLeft to 100 using the greater-than sign (>)."},
+{parts:["let food = 7;\nif (",{hint:"condition",answer:/^food\s*<\s*10$/},") {\n  // buy groceries\n}"],tip:"Write the condition only: check whether food is less than 10."},
+{parts:["for (let i = 0; ",{hint:"when to continue",answer:/^i\s*<\s*5$/},"; ",{hint:"how to count",answer:/^i\+\+$/},") {\n  // find a restroom\n}"],tip:"Fill the first slot with i < 5. Fill the second with i++ to add one each time."},
+{parts:["function repairFluxCapacitor() {\n  return ",{hint:"return value",answer:/^['\"]fixed['\"]$/},";\n}"],tip:"Return the word fixed as a string. Strings need quotes, like 'fixed'."},
+{parts:["let playlist = [",{hint:"three genres",answer:/^['\"]Rock['\"]\s*,\s*['\"]Pop['\"]\s*,\s*['\"]Jazz['\"]$/},"];"],tip:"Enter three quoted strings, separated by commas: 'Rock', 'Pop', 'Jazz'."},
+{parts:["let milesLeft = 0;\nlet arrived = milesLeft ",{hint:"comparison operator",answer:/^===$/}," 0;"],tip:"Replace the assignment with the strict comparison operator ===."}
 ];
 const vehicles=[{name:'Buick LeSabre',icon:'👴',burn:17,moralePerLeg:1,fatiguePerLeg:0,napMorale:2,napFatigue:-5,advantage:'Grandpa-level comfort: +1 morale each drive. Car naps restore 5 extra fatigue.',disadvantage:'Uses 17% gas per leg. The upholstery smells like butterscotch.'},{name:'Cadillac Escalade ESV',icon:'🚙',burn:32,moralePerLeg:2,fatiguePerLeg:-5,napMorale:4,napFatigue:0,advantage:'Room to stretch: +2 morale per drive, 5 less fatigue, and less miserable car naps.',disadvantage:'Burns a staggering 32% gas per leg. Luxury has a price.'},{name:'Toyota Prius',icon:'🚘',burn:9,moralePerLeg:-4,fatiguePerLeg:5,napMorale:-7,napFatigue:5,advantage:'Fuel champion: only 9% gas per leg. Your wallet is thriving.',disadvantage:'Cramped: -4 morale and +5 fatigue per drive. Car naps hurt morale more and restore less fatigue.'},{name:'Cybertruck',icon:'⚡',burn:35,moralePerLeg:-2,fatiguePerLeg:0,napMorale:-3,napFatigue:0,advantage:'Charging costs $14 instead of $22. You can sleep in it, technically.',disadvantage:'Uses 35% charge per leg, -2 morale per drive, and car naps are extra awkward.'}];
 const professions=[
