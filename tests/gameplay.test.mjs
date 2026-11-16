@@ -35,7 +35,15 @@ test('crypto bro pays regular hotel prices',()=>{const h=harness(0,0);h.stop('ho
 test('fuel and groceries replenish their resources',()=>{const h=harness();h.drive();h.stop('fuel');assert.equal(h.game.energy,100);h.stop('groceries');assert.ok(h.game.food>20)});
 test('insufficient cash gives a debt-bearing emergency loan',()=>{const h=harness();h.game.cash=0;h.stop('holiday');assert.equal(h.game.cash,30);assert.equal(h.game.emergencyDebt,30);assert.equal(h.game.morale,77)});
 test('free scenic stops have diminishing returns',()=>{const h=harness();h.stop('scenic');h.stop('scenic');h.stop('scenic');assert.equal(h.game.freeBreaks,3);assert.equal(h.game.morale,100)});
-test('three driving legs require rest',()=>{const h=harness(2);h.game.food=100;h.drive();h.drive();h.drive();assert.equal(h.game.index,3);h.drive();assert.equal(h.game.index,3)});
+test('rest is required by fatigue, not leg count',()=>{
+ const h=harness(2);h.game.food=100;h.drive();h.drive();h.drive();
+ assert.equal(h.game.index,3);
+ h.game.fatigue=30;h.game.energy=100;h.game.food=100;
+ h.drive();assert.equal(h.game.index,4);
+ h.game.fatigue=70;h.game.energy=100;h.game.food=100;
+ h.drive();assert.equal(h.game.index,4);
+ assert.ok(!source.includes('legsSinceRest'));
+});
 test('Taco Bell triggers illness; urgent care clears it',()=>{const h=harness();h.stop('taco');assert.equal(h.game.ecoli,1);h.stop('urgent');assert.equal(h.game.ecoli,0)});
 test('fast driving saves hours compared with careful driving',()=>{const a=harness(),b=harness();a.drive('fast');b.drive('careful');assert.ok(a.game.hours<b.game.hours)});
 test('recovery is triggered when illness becomes fatal',()=>{const h=harness();h.game.ecoli=3;h.game.bathroomUrgency=1;h.drive();assert.equal(h.game.recover,true)});
