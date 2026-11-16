@@ -79,3 +79,19 @@ test('former manager hotel and scenic perks are fully removed',()=>{
  assert.ok(!/MANAGER/i.test(h.game.log[0]));
  assert.equal(h.game.cash,92);
 });
+
+test('low charge and fuel have visible warnings in drive and pit stop screens',()=>{
+ assert.ok(source.includes('CHARGING":"FUEL"} REQUIRED:'));
+ assert.ok(source.includes('CHARGE":"FUEL"} LOW:'));
+ assert.ok(source.includes('CHARGE BEFORE DRIVING'));
+ const h=harness(3,1);h.game.energy=30;h.drive('fast');
+ assert.equal(h.game.index,0);
+ assert.equal(h.game.fastStreak,0);
+});
+test('speeding streak is visible and only completed drives count',()=>{
+ assert.ok(source.includes('FAST DRIVING STREAK:'));
+ const h=harness(3,1);h.game.food=100;h.game.energy=100;h.drive('fast');
+ assert.equal(h.game.fastStreak,1);
+ h.game.energy=0;h.drive('fast');
+ assert.equal(h.game.fastStreak,1);
+});
