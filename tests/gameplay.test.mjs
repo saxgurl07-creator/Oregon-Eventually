@@ -11,7 +11,7 @@ function harness(vehicle=0,profession=0){
  const state={...start,vehicle,profession,cash:160+professions[profession].cash,health:Math.min(100,85+professions[profession].health),morale:Math.min(100,70+professions[profession].morale),xp:professions[profession].xp,log:[...start.log]};
  const h={game:state,car:vehicles[vehicle],pace:'steady',screen:'map',eventReturnScreen:'map'};
  const route=vm.runInNewContext(source.slice(source.indexOf('const routeLegs='),source.indexOf('const quizQuestions='))+';({routeLegs,routeMiles,milesRemaining,drivingHours})');
- const sandbox={Math,console,vehicles,professions,...route,lessons:vm.runInNewContext(slice('const lessons=','const quizQuestions=')+';lessons'),setScreen:v=>h.screen=v,setEventReturnScreen:v=>h.eventReturnScreen=v,setGame:fn=>{h.game=typeof fn==='function'?fn(h.game):fn;sync()},setCode:()=>{},setSlots:()=>{},setWarmupAnswer:()=>{},setWarmupCorrect:()=>{},setLessonSeen:()=>{},setQuiz:()=>{},setQuizAnswer:()=>{},setResult:()=>{},setHint:()=>{},setReview:()=>{}};
+ const sandbox={Math,console,vehicles,professions,...route,lessons:vm.runInNewContext(slice('const lessons=','const quizQuestions=')+';lessons'),setTicketPopup:v=>h.ticketPopup=v,setScreen:v=>h.screen=v,setEventReturnScreen:v=>h.eventReturnScreen=v,setGame:fn=>{h.game=typeof fn==='function'?fn(h.game):fn;sync()},setCode:()=>{},setSlots:()=>{},setWarmupAnswer:()=>{},setWarmupCorrect:()=>{},setLessonSeen:()=>{},setQuiz:()=>{},setQuizAnswer:()=>{},setResult:()=>{},setHint:()=>{},setReview:()=>{}};
  function sync(){sandbox.game=h.game;sandbox.car=vehicles[h.game.vehicle];sandbox.pace=h.pace;sandbox.lesson=sandbox.lessons[Math.min(h.game.index,7)]}
  sync();
  const context=vm.createContext(sandbox);
@@ -125,4 +125,9 @@ test('speeding ticket has a prominent dismissible alert popup, without revealing
  assert.ok(source.includes('if(ticketed)setTicketPopup(true)'));
  assert.ok(source.includes('onClick={()=>setTicketPopup(false)}'));
  assert.ok(!source.includes('FAST DRIVING STREAK:'));
+});
+
+test('ticket popup is triggered only on third completed fast drive',()=>{
+ const h=harness(0,1);h.game.food=100;
+ for(let i=0;i<3;i++){h.game.food=100;h.game.energy=100;h.game.fatigue=0;h.game.morale=80;h.game.health=85;h.drive('fast');assert.equal(Boolean(h.ticketPopup),i===2);}
 });
