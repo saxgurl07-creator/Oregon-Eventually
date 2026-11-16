@@ -131,3 +131,29 @@ test('ticket popup is triggered only on third completed fast drive',()=>{
  const h=harness(0,1);h.game.food=100;
  for(let i=0;i<3;i++){h.game.food=100;h.game.energy=100;h.game.fatigue=0;h.game.morale=80;h.game.health=85;h.drive('fast');assert.equal(Boolean(h.ticketPopup),i===2);}
 });
+
+test('each of the eight code chapters has a distinct gameplay outcome',()=>{
+ const a=source.indexOf('const chapterOutcomes='),b=source.indexOf('const start=',a);
+ assert.ok(a>=0&&b>a);
+ const outcomes=vm.runInNewContext(source.slice(a,b)+';chapterOutcomes');
+ assert.equal(outcomes.length,8);
+ for(const outcome of outcomes){assert.equal(outcome.length,2);assert.ok(outcome[0].length>8);assert.ok(outcome[1].length>20)}
+ assert.match(outcomes[5][0],/FLUX CAPACITOR/);
+});
+test('chapter completion is one-time, saves outcomes, and preserves resource caps',()=>{
+ const a=source.indexOf('function applyChapterSuccess(index){'),b=source.indexOf('function openPitStops(from)',a);
+ assert.ok(a>=0&&b>a);
+ const h={game:{...start,food:98,morale:98,log:[]}};
+ const context=vm.createContext({chapterOutcomes:vm.runInNewContext(source.slice(source.indexOf('const chapterOutcomes='),source.indexOf('const start='))+';chapterOutcomes'),setGame:fn=>h.game=fn(h.game)});
+ vm.runInContext(source.slice(a,b),context);
+ context.applyChapterSuccess(0);assert.equal(h.game.food,100);
+ context.applyChapterSuccess(0);assert.equal(h.game.food,100);
+ context.applyChapterSuccess(1);assert.equal(h.game.chapterOffers.combo,true);
+ context.applyChapterSuccess(2);assert.equal(h.game.chapterOffers.fuelDiscount,true);
+ context.applyChapterSuccess(3);assert.equal(h.game.chapterOffers.groceryAlert,true);
+ context.applyChapterSuccess(4);assert.equal(h.game.chapterOffers.bathroomShield,true);
+ context.applyChapterSuccess(5);assert.equal(h.game.chapterOffers.fluxRepaired,true);
+ context.applyChapterSuccess(6);assert.equal(h.game.morale,100);
+ context.applyChapterSuccess(7);assert.equal(h.game.chapterOffers.gpsFixed,true);
+ assert.equal(h.game.completedChapters.length,8);
+});
