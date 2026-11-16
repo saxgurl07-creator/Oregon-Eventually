@@ -9,7 +9,7 @@ const lessons=[
 ["Boise, Idaho","The Road Trip Playlist","Arrays","You have been listening to the same three songs since Oklahoma. Someone is threatening to throw the radio out.","Create an array named playlist containing 'Rock', 'Pop', and 'Jazz' in that order.","let playlist = [];","let playlist = ['Rock', 'Pop', 'Jazz'];",/\b(?:let|const|var)\s+playlist\s*=\s*\[\s*['"]Rock['"]\s*,\s*['"]Pop['"]\s*,\s*['"]Jazz['"]\s*\]/],
 ["Bend, Oregon","The GPS Is Lying","Debugging","The GPS says you arrived, but you are staring at a suspiciously empty parking lot. Fix the comparison before you celebrate.","Fix the arrived variable so it compares milesLeft with 0 using === instead of assigning a value.","let milesLeft = 0;\nlet arrived = milesLeft = 0;","let arrived = milesLeft === 0;",/\b(?:let|const|var)\s+arrived\s*=\s*milesLeft\s*===\s*0\s*;?/]
 ];
-const vehicles=[{name:'Buick LeSabre',icon:'👴',burn:17,advantage:'Comfortable grandpa cruiser. Reasonable gas use.',disadvantage:'Not particularly efficient. Smells faintly of hard candy.'},{name:'Cadillac Escalade ESV',icon:'🚙',burn:32,advantage:'Massive SUV. Plenty of room for your questionable decisions.',disadvantage:'Drinks gas like it has a personal vendetta against your wallet.'},{name:'Toyota Prius',icon:'🚘',burn:9,advantage:'Best gas mileage. More money left for snacks and bad choices.',disadvantage:'You must live with being the most sensible person at every stop.'},{name:'Cybertruck',icon:'⚡',burn:35,advantage:'Electric. Charging stops cost $14 instead of $22 for gas.',disadvantage:'Uses 35% charge per leg. Range anxiety is now your personality.'}];
+const vehicles=[{name:'Buick LeSabre',icon:'👴',burn:17,moralePerLeg:1,fatiguePerLeg:0,napMorale:2,napFatigue:-5,advantage:'Grandpa-level comfort: +1 morale each drive. Car naps restore 5 extra fatigue.',disadvantage:'Uses 17% gas per leg. The upholstery smells like butterscotch.'},{name:'Cadillac Escalade ESV',icon:'🚙',burn:32,moralePerLeg:2,fatiguePerLeg:-5,napMorale:4,napFatigue:0,advantage:'Room to stretch: +2 morale per drive, 5 less fatigue, and less miserable car naps.',disadvantage:'Burns a staggering 32% gas per leg. Luxury has a price.'},{name:'Toyota Prius',icon:'🚘',burn:9,moralePerLeg:-4,fatiguePerLeg:5,napMorale:-7,napFatigue:5,advantage:'Fuel champion: only 9% gas per leg. Your wallet is thriving.',disadvantage:'Cramped: -4 morale and +5 fatigue per drive. Car naps hurt morale more and restore less fatigue.'},{name:'Cybertruck',icon:'⚡',burn:35,moralePerLeg:-2,fatiguePerLeg:0,napMorale:-3,napFatigue:0,advantage:'Charging costs $14 instead of $22. You can sleep in it, technically.',disadvantage:'Uses 35% charge per leg, -2 morale per drive, and car naps are extra awkward.'}];
 const professions=[
 {name:"Corporate Manager",icon:"💼",description:"More cash, less patience.",cash:100,morale:-12,health:0,xp:0},
 {name:"Mechanic",icon:"🔧",description:"Roadside fixes come naturally.",cash:-20,morale:0,health:8,xp:0},
@@ -44,7 +44,8 @@ scenic:{price:0,food:0,health:0,morale:15,fatigue:-5,label:["SCENIC OVERLOOK: A 
 urgent:{price:30,food:0,health:35,morale:0,fatigue:0,label:"URGENT CARE: You are hydrated, patched up and politely asked to stop eating suspicious lettuce."},
 bathroom:{price:0,food:0,health:0,morale:-2,label:"RESTROOM EMERGENCY: You made it to a bathroom. The gas station attendant is deeply concerned."}
 };
-const o=offers[kind];if(!o)return;
+const base=offers[kind];if(!base)return;
+const o=kind==="carrest"?{...base,morale:base.morale+(vehicles[game.vehicle]?.napMorale??0),fatigue:base.fatigue+(vehicles[game.vehicle]?.napFatigue??0),label:base.label+" "+(["BUICK BONUS: The bench seat feels suspiciously like Grandma’s sofa.","ESCALADE BONUS: You have enough room to lie down without folding into a pretzel.","PRIUS PENALTY: You wake up shaped like a paperclip. Your knees have filed a grievance.","CYBERTRUCK PENALTY: You tried to recline. The geometry said no."][game.vehicle]??"")}:base;
 if(game.cash<o.price){setScreen("event");setGame(g=>({...g,cash:g.cash+30,log:["ROADSIDE ASSISTANCE: A $30 emergency voucher arrives. Try your purchase again.",...g.log].slice(0,7)}));return}
 setScreen("event");
 setGame(g=>{
@@ -67,9 +68,9 @@ const cost=(pace==="fast"?8:pace==="careful"?4:6)+car.burn/5-(game.profession===
 const food=Math.max(0,game.food-cost);
 const energy=Math.max(0,game.energy-car.burn);
 const health=Math.max(0,Math.min(100,game.health+(pace==="careful"?4:-3)+(game.profession===3?2:0)-(missed?illness*17:0)));
-const morale=Math.max(0,Math.min(100,game.morale+(pace==="fast"?-6:2)-(missed?10:0)));
+const morale=Math.max(0,Math.min(100,game.morale+(pace==="fast"?-6:2)+(car.moralePerLeg??0)-(missed?10:0)));
 const fatal=sick&&(illness>=4||health===0);
-const recover=fatal||food===0||health===0||energy===0;const fatigue=Math.min(100,game.fatigue+(pace==="fast"?35:pace==="careful"?15:25));
+const recover=fatal||food===0||health===0||energy===0;const fatigue=Math.min(100,game.fatigue+(pace==="fast"?35:pace==="careful"?15:25)+(car.fatiguePerLeg??0));
 const event=fatal?"YOU HAVE DIED OF E. COLI. Cause of death: contaminated Taco Bell lettuce and ignoring increasingly urgent bathroom stops. A JavaScript medic can revive you.":missed?"E. COLI WARNING: You skipped another bathroom stop. Your stomach has declared a state of emergency. Visit a restroom and buy groceries before continuing.":sick?"E. COLI: Your stomach is still furious. Bathroom breaks and groceries will help you recover.":lesson[0]+": "+lesson[1]+" completed.";
 setGame(g=>({...g,index:i+1,food,energy,health,morale,fatigue,legsSinceRest:g.legsSinceRest+1,ecoli:illness,bathroomUrgency:urgency,xp:g.xp+10+i*5+(g.profession===5?5:0),recover,log:[event,...g.log].slice(0,7)}));
 setCode(lessons[Math.min(i+1,7)][5]);setLessonSeen(false);setQuiz(false);setQuizAnswer(-1);setResult("");setHint(false);setReview("");
