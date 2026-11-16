@@ -116,3 +116,13 @@ test('third fast drive triggers ticket even with pit stops and slower drives bet
  assert.equal(h.game.fastStreak,0);
  assert.ok(h.game.log[0].includes('SPEEDING TICKET'));
 });
+
+test('speeding ticket has a prominent dismissible alert popup, without revealing streak',()=>{
+ assert.ok(source.includes('role="alertdialog"'));
+ assert.ok(source.includes('aria-modal="true"'));
+ assert.ok(source.includes('PULL OVER!'));
+ assert.ok(source.includes('ACCEPT TICKET · -$45'));
+ assert.ok(source.includes('if(ticketed)setTicketPopup(true)'));
+ assert.ok(source.includes('onClick={()=>setTicketPopup(false)}'));
+ assert.ok(!source.includes('FAST DRIVING STREAK:'));
+});
