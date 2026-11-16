@@ -82,8 +82,8 @@ scenic:["TEACHER INCIDENT: You gave a squirrel an unsolicited lesson on ecosyste
 };
 if(game.profession!==6){
 const variants=careerNotes[game.profession]?.[kind];
-if(variants&&(kind==="scenic"||kind==="carrest")&&Math.random()<0.6)o={...o,label:o.label+"\\n"+pick(variants)};
-else if(variants&&kind!=="scenic"&&kind!=="carrest"&&!(game.profession===4&&kind==="scenic"))o={...o,label:o.label.replace(/\\n(?:MANAGER PERK|MECHANIC PERK|NURSE PERK|TEACHER PERK|INFLUENCER BONUS):[^\\n]*/,"")+"\\n"+pick(variants)};
+if(variants&&(kind==="scenic"||kind==="carrest")&&Math.random()<0.6)o={...o,label:o.label+"\n"+pick(variants)};
+else if(variants&&kind!=="scenic"&&kind!=="carrest"&&!(game.profession===4&&kind==="scenic"))o={...o,label:o.label.replace(/\n(?:MANAGER PERK|MECHANIC PERK|NURSE PERK|TEACHER PERK|INFLUENCER BONUS):[^\n]*/,"")+"\n"+pick(variants)};
 }
 if(game.profession===6&&Math.random()<0.35){
 const lucky=Math.random()<0.55;
